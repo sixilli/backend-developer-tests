@@ -16,7 +16,6 @@ func TestFizzBuzz(t *testing.T) {
 
 	for i := int64(1); i <= total; i++ {
 		if !(i%fizzAt == 0) && !(i%buzzAt == 0) {
-			fmt.Printf("%v - ", i)
 			number, err := strconv.ParseInt(res[i-1], 10, 64)
 			if err != nil {
 				fmt.Println("Parse Int failed")
@@ -24,7 +23,7 @@ func TestFizzBuzz(t *testing.T) {
 			}
 
 			if number != i {
-				fmt.Println("Number failed")
+				fmt.Println("Number mismatch")
 				t.Fail()
 			}
 			continue

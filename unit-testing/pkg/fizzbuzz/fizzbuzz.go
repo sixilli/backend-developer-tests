@@ -14,6 +14,12 @@ import (
 // - Return the original number if is is not divisible by either the `fizzAt` or
 //   the `buzzAt` values.
 func FizzBuzz(total, fizzAt, buzzAt int64) []string {
+	if total < 0 {
+		result := make([]string, 1)
+		result[0] = "Total must be greater than 0"
+		return result
+	}
+
 	result := make([]string, total)
 
 	for i := int64(1); i <= total; i++ {

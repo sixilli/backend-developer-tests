@@ -2,10 +2,11 @@ package models
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"net/http"
 
-	"github.com/satori/go.uuid"
+	"github.com/labstack/echo"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Person defines a simple representation of a person
@@ -53,19 +54,50 @@ var people = []*Person{
 }
 
 // AllPeople returns all people in `people`.
-func AllPeople() []*Person {
-	return people
+func AllPeople(c echo.Context) error {
+	firstName := c.QueryParam("first_name")
+	lastName := c.QueryParam("last_name")
+
+	if len(firstName) > 0 || len(lastName) > 0 {
+		res := FindPeopleByName(firstName, lastName)
+
+		if len(res) == 0 {
+			return c.JSON(404, fmt.Sprintf("Could not find anyone with the name %v %v", firstName, lastName))
+		}
+
+		return c.JSON(http.StatusOK, res)
+	}
+
+	phoneNumber := c.QueryParam("phone_number")
+
+	if len(phoneNumber) > 0 {
+		res := FindPeopleByPhoneNumber(phoneNumber)
+
+		if len(res) == 0 {
+			return c.JSON(404, fmt.Sprintf("Could not find anyone with the phone number %v ", phoneNumber))
+		}
+
+		return c.JSON(http.StatusOK, res)
+	}
+
+	return c.JSON(http.StatusOK, people)
 }
 
 // FindPersonByID searches for people in `people` the by their ID.
-func FindPersonByID(id uuid.UUID) (*Person, error) {
+func FindPersonByID(c echo.Context) error {
+	inputID := c.Param("id")
+	id, err := uuid.FromString(inputID)
+	if err != nil {
+		return c.JSON(404, fmt.Sprintf("Could not convert UUID from string: %v", inputID))
+	}
+
 	for _, person := range people {
 		if person.ID == id {
-			return person, nil
+			return c.JSON(200, person)
 		}
 	}
 
-	return nil, errors.New(fmt.Sprintf("user ID %s not found", id.String()))
+	return c.JSON(404, fmt.Sprintf("user ID %s not found", id.String()))
 }
 
 // FindPeopleByName performs a case-sensitive search for people in `people` by first and last name.

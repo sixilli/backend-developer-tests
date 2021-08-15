@@ -24,14 +24,14 @@ func NewSimplePool(maxConcurrent int) SimplePool {
 
 	// Create workers and jobs channel
 	for i := 0; i < maxConcurrent; i++ {
-		go worker(i, jobs)
+		go Worker(i, jobs)
 	}
 
 	return sp
 }
 
 // Generic worker with some added text to verify things are working
-func worker(id int, jobs <-chan func()) {
+func Worker(id int, jobs <-chan func()) {
 	for job := range jobs {
 		fmt.Printf("worker %v starting sleep\n", id)
 		job()

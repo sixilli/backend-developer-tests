@@ -71,14 +71,13 @@ func (sjp *SlottedJobPool) Submit(ctx context.Context, task func(context.Context
 	select {
 	case <-ctx.Done():
 		fmt.Println("ctx.DONE")
-		close(sjp.jobs)
 	case sjp.jobs <- task:
 		fmt.Println("Submitted task")
 	default:
-		fmt.Println("Waiting to submit task")
+		fmt.Println("Waiting")
 		<-sjp.jobs
 		sjp.jobs <- task
-		fmt.Println("Done submit task")
+		fmt.Println("Submitted")
 	}
 
 	return nil
@@ -87,6 +86,7 @@ func (sjp *SlottedJobPool) Submit(ctx context.Context, task func(context.Context
 func (sjp *SlottedJobPool) Close(closeFunc context.CancelFunc) error {
 	closeFunc()
 	sjp.wg.Wait()
+	close(sjp.jobs)
 	return nil
 }
 

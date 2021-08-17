@@ -36,12 +36,12 @@ func main() {
 		fmt.Println(err)
 	}
 
-	for i := 1; i <= 40; i++ {
+	for i := 1; i <= 20; i++ {
 		err := ap.Submit(ctx, AdvWaiting)
 		if err != nil {
 			fmt.Println(err)
 		}
-		if i%30 == 0 {
+		if i%10 == 0 {
 			fmt.Println("CLOSE")
 			ap.Close(cancleCtx)
 		}
